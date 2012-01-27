@@ -32,18 +32,18 @@ ver 1.2		各アイテムの幅の取得が正しく行えてなかったのを�
 ``` js
 $(function() {
 
-	# Options / [] is default
+	// Options / [] is default
 	var caruselOpt = {
-		prev: '#prev',		# Previous button ID 	[.prev]
-		next: '#next',		# Next button ID 		[.next]
-		item: 'li',			# Scroll Target Object	[.item]
-		scroll: 1,			# Scroll item block		[1]
-		auto: 3000,			# Auto scroll timer		[0]
-		speed:400,			# Scroll speed			[400]
-		easing:"swing"		# Scroll easing			["swing"]
+		prev: '#prev',		// Previous button ID 	[.prev]
+		next: '#next',		// Next button ID 		[.next]
+		item: 'li',			// Scroll Target Object	[.item]
+		scroll: 1,			// Scroll item block		[1]
+		auto: 3000,			// Auto scroll timer		[0]
+		speed:400,			// Scroll speed			[400]
+		easing:"swing"		// Scroll easing			["swing"]
 	};
 	
-	# Initialize
+	// Initialize
 	$('ul').sygCarousel( caruselOpt );
 });
 ```
