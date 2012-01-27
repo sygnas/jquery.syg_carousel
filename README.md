@@ -4,10 +4,12 @@
 jQuery.syg_carousel
 
 ##VERSION
-version 1.1
+version 1.2
 
 jQuery VERSION
 version 1.2.6
+
+ver 1.2		各アイテムの幅の取得が正しく行えてなかったのを修正。
 
 ##SYNOPSIS
 
