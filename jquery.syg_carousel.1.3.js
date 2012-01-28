@@ -1,7 +1,7 @@
 /*****************************************
 
 jQuery.syg_carousel
-version 1.2
+version 1.3
 Hiroshi Fukuda <dada@sygnas.jp>
 http://sygnas.jp/
 
@@ -39,44 +39,24 @@ Copyright (c) 2011-2012 Hiroshi Fukuda, http://sygnas.jp/
 
 (function( jQuery ){
 	
+	var totalWidth = 0;
+	var isAnimated = 0;
+	
 	/*************************
 	* コンストラクタ
+	* @param root	グループ全体
 	*/
 	function SygCarousel( root, opt ){
 		
-		var isAnimated = false;
-		var index = 0;
 		var itemList = [];
-		var widthList = [];
-		var indexList = [];
-		
 		var self = this;
 		var areaW = root.width();
 		
+		// スクロール対象をリストに保存
 		jQuery( opt.item, root ).each( function(){
-			itemList.push( this );
+			itemList.push( new ScrollItem(this) );
 		})
 
-		// 各アイテムの幅を調べる
-		// 属性を与える
-		
-		var left = 0;
-
-		for( var i=0; i<itemList.length; i++ )
-		{
-			var item = jQuery(itemList[i]);
-			jQuery(item).css( {position:'absolute'} );
-			
-			var w = item.outerWidth({margin:true});
-			
-			jQuery(item).css( {top:0, left:left } );
-
-			widthList.push( w );
-			indexList.push( i );
-			
-			left += w;
-		}
-		
 		// autoが設定されているなら setInterval
 		if( opt.auto > 0 ){
 			setInterval( nextSeek, opt.auto );
@@ -96,7 +76,7 @@ Copyright (c) 2011-2012 Hiroshi Fukuda, http://sygnas.jp/
 			
 			// 移動分の幅を取得
 			for( var i=0; i<opt.scroll; i++ ){
-				w -= widthList[i];
+				w -= itemList[i].width;
 			}
 			seekPosition( w );
 		}
@@ -108,12 +88,12 @@ Copyright (c) 2011-2012 Hiroshi Fukuda, http://sygnas.jp/
 			if( isAnimated ) return;
 			
 			var w = 0;
-			var len = widthList.length;
+			var len = itemList.length;
 			var target = len - opt.scroll;
 			
-			// 移動分の幅を取得
+			// 移動分の幅を後ろから順に取得
 			for( var i=len-1 ; i>=target ; i-- ){
-				w += widthList[i];
+				w += itemList[i].width;
 			}
 			seekPosition( w );
 		});
@@ -123,72 +103,103 @@ Copyright (c) 2011-2012 Hiroshi Fukuda, http://sygnas.jp/
 		*/
 		function seekPosition( w ){
 
-			isAnimated = true;	// アニメーション中
-			
 			var len = itemList.length;
+			isAnimated = len;	// アニメーション中の個数
 			
 			for( var i=0 ; i<len ; i++ ){
-				var item = jQuery(itemList[i]);
-				
-				if( i==len-1 ){
-					item.animate({ left:'+='+w }, opt.speed, opt.easing, onAnimeComplete );
-				}else{
-					item.animate({ left:'+='+w }, opt.speed, opt.easing );
-				}
+				var item = itemList[i];
+				item.scroll( w , opt.speed, opt.easing, onAnimeComplete );
 			}
-			
 		}
 		
 		/*************************
 		* アニメーション終了
 		*/
 		function onAnimeComplete( ){
+			
+			// アニメーションしているアイテムがまだあれば抜ける
+			if( --isAnimated > 0 ) return;
+			
+			
 			var len = itemList.length;
 			
 			// 画面外に移動したものを移動させる
 			for( var i=0 ; i<len ; i++ ){
 
 				// 常に先頭をチェック
-				var item = jQuery(itemList[0]);
-				var x = item.position().left;
+				var item = itemList[0];
+				var x = item.getX();
 				
 				if( x < 0 ){
-					// 画面の左側に出た
-					// 最後の座標
-					var lastItem = jQuery(itemList[len-1]);
-					var lastRight = lastItem.position().left + lastItem.outerWidth({margin:true});
-					
-					item.css({ left:lastRight });
-					item.hide();
-					item.fadeIn('fast');
+					item.moveLast();
 					
 					// 後ろに付ける
 					itemList.push( itemList.shift() );
-					widthList.push( widthList.shift() );
-					indexList.push( indexList.shift() );
 
 				}else if( x > 0 ){
-					// 画面の右側に出た
-					// 最後のやつを先頭に
-					var lastItem = jQuery(itemList[len-1]);
-					lastItem.css({ left:x - widthList[len-1] });
-					
-					lastItem.hide();
-					lastItem.fadeIn('fast');
+					itemList[len-1].moveTop();
 					
 					// 最初に付ける
 					itemList.unshift( itemList.pop() );
-					widthList.unshift( widthList.pop() );
-					indexList.unshift( indexList.pop() );
 				}
 			}
-			isAnimated = false;
 		}
+	}
+	
+	/*************************
+	 * スクロールアイテムクラス
+	 * @param item	jQueryObject
+	 */
+	var ScrollItem = function( item ){
+		this.itemObj = jQuery( item );
+		
+		// position:absolute にして、位置指定
+		this.itemObj.css( {position:'absolute'} );
+		this.width = this.itemObj.outerWidth();
+		this.itemObj.css( {position:'absolute', top:0, left:totalWidth} );
+		
+		totalWidth += this.width;
+	}
+	
+	/********************
+	 * スクロール
+	 */
+	ScrollItem.prototype.scroll = function( w, speed, easing, onComplete ){
+		this.itemObj.animate({ left:'+='+w }, speed, easing, onComplete );
+	}
+	
+	/********************
+	 * 最後に移動
+	 */
+	ScrollItem.prototype.moveLast = function(){
+		var targetX = this.getX() + totalWidth;
+		this.itemObj.css({ left:targetX });
+		this.itemObj.hide();
+		this.itemObj.fadeIn('fast');
+	}
+	
+	/********************
+	 * 先頭に移動
+	 */
+	ScrollItem.prototype.moveTop = function(){
+		var targetX = this.getX() - totalWidth;
+		this.itemObj.css({ left:targetX });
+		this.itemObj.hide();
+		this.itemObj.fadeIn('fast');
+	}
+	
+	/********************
+	 * 座標
+	 */
+	ScrollItem.prototype.getX = function(){
+		return this.itemObj.position().left;
 	}
 	
 	
 	
+	
 	/*************************
+	**************************
 	* プラグイン定義
 	*/
 	jQuery.fn.sygCarousel = function( config ) {
