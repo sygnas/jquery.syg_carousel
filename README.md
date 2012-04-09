@@ -1,79 +1,39 @@
-#jQuery.syg_carousel - simple and size adjustable carousel
+#jQuery SygCarousel - simple carousel
 
 ##NAME
-jQuery.syg_carousel
+jQuery SygCarousel
 
 ##VERSION
-version 1.3
+version 1.4
 
 jQuery VERSION  
 version 1.6.2
 
-2012.01.28 ver 1.3  
-	スクロールオブジェクトを別クラスに分けた。  
-	READMEにmarginがあると不具合が発生する旨を追記。  
-2012.01.27 ver 1.2  
-	各アイテムの幅の取得が正しく行えてなかったのを修正。
+2012.04.10 ver 1.4  
+
+* 作り直しました。外部からの呼び出しや、スクロール終了のイベント発行などできるようになっています。
 
 ##SYNOPSIS
 
-###HTML
-``` html
-<!-- Previous button -->
-<img src="prev.png" id="prev" />
-
-<!-- Carousel list -->
-<ul id="carousel">
-	<li><img src="pickup_1.gif" /></li>
-	<li><img src="pickup_2.gif" /></li>
-</ul>
-
-<!-- Next button -->
-<img src="next.png" id="next" />
-```
-
-### CSS
-``` css
-#carousel{
-	padding:	0;
-	margin:		0;
-	width:		760px;
-	height:		200px;
-	overflow:	hidden;
-}
-#carousel li{
-	list-style-type: none;
-}
-```
-
-### jQuery.syg_carousel setup
-``` js
-$(function() {
-
-	// Options / [] is default
-	var caruselOpt = {
-		prev: '#prev',		// Previous button ID 	[.prev]
-		next: '#next',		// Next button ID 		[.next]
-		item: 'li',			// Scroll Target Object	[.item]
-		scroll: 1,			// Scroll item block		[1]
-		auto: 3000,			// Auto scroll timer		[0]
-		speed:400,			// Scroll speed			[400]
-		easing:"swing"		// Scroll easing			["swing"]
-	};
-	
-	// Initialize
-	$('ul').sygCarousel( caruselOpt );
-});
-```
+[DEMO jQuery SygCarousel](http://sygnas.jp/sygcarousel/)
 
 ##DESCRIPTION
 シンプルなカルーセルがなかったので作りました。  
-スクロール対象となるオブジェクト（画像など）の幅は可変なのが特徴です。  
 自分用に作ったものなので不具合や未実装な部分があるかもしれません。
 
 ※スクロール対象にmarginを設定すると座標の取得がおかしなことになります。
 
 ##METHOD
+
+##OLD VERSION
+2012.01.28 ver 1.3  
+
+*スクロールオブジェクトを別クラスに分けた。  
+*READMEにmarginがあると不具合が発生する旨を追記。  
+
+2012.01.27 ver 1.2  
+
+*各アイテムの幅の取得が正しく行えてなかったのを修正。
 
 ##AUTHOR
 Hiroshi Fukuda <dada@sygnas.jp>  
